@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>My dashboard</title>
+    <script type="text/javascript" src="/assets/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.gridster.js"></script>    
+    <script type="text/javascript" src="/assets/js/react.js"></script>
+    <script type="text/javascript" src="/assets/js/JSXTransformer.js"></script>    
+    <link rel="stylesheet" href="/assets/css/application.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
+    <style>
+    .fuck{
+      height: 900px; 
+      position: relative;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div style="width: 1440px;" class="gridster ready"></div>
+    </div>
+  </body>
+  <script type="text/jsx">
+  /** @jsx React.DOM */
+  var Widget = React.createClass({
+    getDefaultProps : function() {
+      return {
+        "row" : 1,
+        "col" : 1,
+        "sizex" : 1,
+        "sizey" : 1
+      };
+    },    
+    getInitialState: function() {
+      return {
+        value: "Test"
+      };
+    },    
+    render: function() {
+      return (
+        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
+          <div className="widget widget-text">
+            <h1>{this.state.value}</h1>
+          </div>
+        </li>        
+      );
+    }
+  });
+
+  var HeartBeat = React.createClass({
+    getInitialState: function() {
+      return {
+        secondsElapsed: 0,
+        isAlive: true                
+      };
+    },
+    tick: function() {
+      console.log(this);
+      this.setState({
+        isAlive: this.isAlive(),
+        secondsElapsed: this.state.secondsElapsed + 1,
+        
+      });
+    },
+    isAlive:function(){
+      if( this.state.secondsElapsed > 30){
+        return false;
+      }
+      return true;
+    },
+    componentDidMount: function() {
+      this.interval = setInterval(this.tick, 1000);
+    },
+    componentWillUnmount: function() {
+      clearInterval(this.interval);
+    },
+    render: function() {
+      return (
+        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
+          <div className={'widget ' + (this.state.isAlive ? 'widget-pass' : 'widget-fail')}>
+            <h1>Seconds since last beat:</h1>
+            <h2>{this.state.secondsElapsed}</h2>
+            <i className={'icon-background ' + (this.state.isAlive ? 'icon-ok-circle' : 'icon-ban-circle')}></i>
+          </div>
+        </li>
+      );
+    }
+  });
+
+  var Connected = React.createClass({
+    getInitialState: function() {
+      return {
+        title: "nothing",
+      };
+    },
+    messageHandler: function(msg){
+      var data = JSON.parse(msg.data);
+      if(data.widget == "connected"){
+        this.setState(data);
+      }
+    },
+    componentDidMount: function() {
+      var evtSrc = new EventSource("/subscribe");
+      evtSrc.onmessage = this.messageHandler
+    },
+    render: function() {
+      return (
+        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
+          <div className="widget widget-comments">
+            <h1>{this.state.title}</h1>
+          </div>
+        </li>
+      );
+    }
+  });
+
+
+
+  var Clock = React.createClass({
+    getInitialState: function() {
+      return {
+        clock: this.getTime(),
+        date: this.getDate()
+      };
+    },
+    tick: function() {
+      this.setState({
+        clock: this.getTime(),
+        date: this.getDate()
+      });
+    },
+    getTime: function(){
+      var date = new Date();
+      var h = date.getHours() > 9 ? date.getHours() : '0' +date.getHours();
+      var m = date.getMinutes() > 9 ? date.getMinutes() : '0' +date.getMinutes();
+      var s = date.getSeconds() > 9 ? date.getSeconds() : '0' +date.getSeconds();
+      return h + ":" + m + ":" +s;
+    },
+    getDate: function(){
+      var date = new Date();
+      return date.toDateString(); 
+    },            
+    componentDidMount: function() {
+      this.interval = setInterval(this.tick, 1000);
+    },
+    componentWillUnmount: function() {
+      clearInterval(this.interval);
+    },
+    render: function() {
+      return (
+        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
+          <div className="widget widget-text">
+            <h1>{this.state.date}</h1>
+            <h2>{this.state.clock}</h2>
+            <i className="icon-time icon-background"></i>
+          </div>
+        </li>
+      );
+    }
+  });
+
+
+  var WidgetList = React.createClass({
+    render: function() {
+      return (
+        <ul className="fuck">
+          <HeartBeat row="1" col="1" row="1" sizex="1" sizey="1"/>
+          <Clock row="1" col="2" row="1" sizex="1" sizey="1"/>
+          <Connected row="1" col="3" sizex="1" sizey="1"/>
+          <Widget row="1" col="4"/>
+          <Widget row="2" col="1"/>
+          <Widget row="2" col="2"/>
+          <Widget row="2" col="3"/>
+          <Widget row="2" col="4"/>
+        </ul>
+      );
+    }
+  });
+
+  React.renderComponent(<WidgetList/>, $('.gridster').get(0) );
+
+  $(".gridster ul").gridster({
+    widget_margins: [5, 5],
+    widget_base_dimensions: [360, 450]
+  });
+
+  </script>
+
+
+</html>
