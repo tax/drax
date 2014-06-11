@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width">
     <title>My dashboard</title>
     <script type="text/javascript" src="/assets/js/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="/assets/js/jquery.gridster.js"></script>    
-    <script type="text/javascript" src="/assets/js/react.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.gridster.min.js"></script>    
+    <script type="text/javascript" src="/assets/js/react.min.js"></script>
     <script type="text/javascript" src="/assets/js/JSXTransformer.js"></script> 
     <script type="text/jsx" src="/assets/application.js"></script>
 
@@ -25,71 +25,18 @@
   </body>
   <script type="text/jsx">
   /** @jsx React.DOM */
-  var Widget = React.createClass({
-    getDefaultProps : function() {
-      return {
-        "row" : 1,
-        "col" : 1,
-        "sizex" : 1,
-        "sizey" : 1
-      };
-    },    
-    getInitialState: function() {
-      return {
-        value: "Test"
-      };
-    },    
-    render: function() {
-      return (
-        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
-          <div className="widget widget-text">
-            <h1>{this.state.value}</h1>
-          </div>
-        </li>        
-      );
-    }
-  });
-
-  var Connected = React.createClass({
-    getInitialState: function() {
-      return {
-        title: "nothing",
-      };
-    },
-    messageHandler: function(msg){
-      //var data = JSON.parse(msg.data);
-      //if(data.widget == "connected"){
-      //  this.setState(data);
-      //}
-      console.log(msg.data);
-    },
-    componentDidMount: function() {
-      var evtSrc = new EventSource("/subscribe");
-      evtSrc.onmessage = this.messageHandler
-    },
-    render: function() {
-      return (
-        <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
-          <div className="widget widget-comments">
-            <h1>{this.state.title}</h1>
-          </div>
-        </li>
-      );
-    }
-  });
-
   var WidgetList = React.createClass({
     render: function() {
       return (
         <ul className="fuck">
-          <HeartBeat row="1" col="1" row="1" sizex="1" sizey="1"/>
-          <Clock row="1" col="2" row="1" sizex="1" sizey="1"/>
-          <Connected row="1" col="3" sizex="1" sizey="1"/>
-          <Widget row="1" col="4"/>
-          <Widget row="2" col="1"/>
-          <Widget row="2" col="2"/>
-          <Widget row="2" col="3"/>
-          <Widget row="2" col="4"/>
+          <HeartBeat row={1} col={1}/>
+          <Clock row={1} col={2}/>
+          <Text row={1} col={3}/>
+          <Text widgetid="mywidget" row={1} col={4} initialTitle="Fuck you"/>
+          <Text widgetid="mywidget2" row={2} col={1} initialText="Fuck you"/>
+          <Text widgetid="mywidget3" row={2} col={2}/>
+          <Text widgetid="mywidget4" row={2} col={3}/>
+          <Text widgetid="mywidget5" row={2} col={4} sizex="1" sizey="1"/>
         </ul>
       );
     }

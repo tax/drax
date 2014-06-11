@@ -1,4 +1,17 @@
 var HeartBeat = React.createClass({
+  propTypes : {
+    row : React.PropTypes.number.isRequired,
+    col : React.PropTypes.number.isRequired,
+    sizex : React.PropTypes.number,
+    sizey : React.PropTypes.number,
+  },
+  getDefaultProps : function() {
+    return {
+      sizex : 1,
+      sizey : 1,
+      icon : "icon-time"
+    };
+  },  
   getInitialState: function() {
     return {
       secondsElapsed: 0,

@@ -1,4 +1,18 @@
 var Clock = React.createClass({
+  propTypes : {
+    row : React.PropTypes.number.isRequired,
+    col : React.PropTypes.number.isRequired,
+    sizex : React.PropTypes.number,
+    sizey : React.PropTypes.number,
+    icon : React.PropTypes.string,
+  },
+  getDefaultProps : function() {
+    return {
+      sizex : 1,
+      sizey : 1,
+      icon : "icon-time"
+    };
+  },
   getInitialState: function() {
     return {
       clock: this.getTime(),
@@ -34,7 +48,7 @@ var Clock = React.createClass({
         <div className="widget widget-text">
           <h1>{this.state.date}</h1>
           <h2>{this.state.clock}</h2>
-          <i className="icon-time icon-background"></i>
+          <i className={'icon-background ' + (this.props.icon)}></i>
         </div>
       </li>
     );

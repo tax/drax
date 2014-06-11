@@ -9,6 +9,7 @@ import (
     "path/filepath"    
     "strings"
     "bufio"
+    "encoding/json"
     "io"
 )
 
@@ -168,11 +169,34 @@ func main() {
     // is called in a separate goroutine for each 
     // request to "/events/".
     http.Handle("/subscribe", b)
-
+/*
     http.HandleFunc("/publish", func(w http.ResponseWriter, r *http.Request) {
         b.messages <- fmt.Sprintf("The time is %v", time.Now())
-        w.WriteHeader(204)
+        //w.WriteHeader(204)
+        //w.Write("ok")
+        fmt.Fprintf(w, "Hi there, I love !")
     })
+*/
+    go func() {
+        for i := 0; ; i++ {
+
+        // Create a little message to send to clients,
+        // including the current time.
+        //body = JSON.parse(request.body.read)
+        //body['dashboard'] ||= params['id']
+        //auth_token = body.delete("auth_token")
+        //body[:id] = id
+        //body[:updatedAt] ||= Time.now.to_i
+
+        b.messages <- fmt.Sprintf(`{"id":"mywidget", "dashboard":"mydashboard", "updatedAt":"%v"}`, time.Now())
+
+        // Print a nice log message and sleep for 5s.
+        log.Printf("Sent message %d ", i)
+        time.Sleep(5 * 1e9)
+
+        }
+    }()
+
 
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "templates/index.html")
@@ -222,4 +246,15 @@ func main() {
 
     // Start the server and listen forever on port 8000.
     http.ListenAndServe(":8000", nil)
+}
+
+func main2(){
+    b := []byte(`{"Name":"Wednesday dsdsds","Age":6,"Parents":["Gomez","Morticia"]}`)
+    var f interface{}
+    err := json.Unmarshal(b, &f)
+    if err != nil { panic(err) }
+    m := f.(map[string]interface{})
+    
+    log.Printf(m["Name"].(string))
+    //log.Printf(m["Name"].(string))
 }
