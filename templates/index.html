@@ -8,7 +8,6 @@
     <script type="text/javascript" src="/assets/js/react.min.js"></script>
     <script type="text/javascript" src="/assets/js/JSXTransformer.js"></script> 
     <script type="text/jsx" src="/assets/application.js"></script>
-
     <link rel="stylesheet" href="/assets/css/application.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
     <style>
@@ -23,6 +22,42 @@
       <div style="width: 1440px;" class="gridster ready"></div>
     </div>
   </body>
+
+<script>
+var WidgetStore = {
+    _widgets : {},
+
+    init: function(eventSource){
+      var that = this;
+      eventSource.onmessage = function(msg){
+        var data = JSON.parse(msg.data);
+        var cb = that._widgets[data.id];
+        return cb(data);        
+      }
+    },
+
+    messageHandler: function(msg){
+      console.log(this._widgets);
+      var data = JSON.parse(msg.data);
+      var cb = this._widgets[data.id];
+      return cb(data);
+    },
+    
+    addChangeListener: function(widgetId, callback){
+        this._widgets[widgetId] = callback;
+    }, 
+
+    removeChangeListener: function(widgetId, callback){
+        delete this._widgets[widgetId];
+    }
+    
+};
+
+var evtSrc = new EventSource("/subscribe");
+WidgetStore.init(evtSrc);
+
+</script>
+
   <script type="text/jsx">
   /** @jsx React.DOM */
   var WidgetList = React.createClass({
@@ -31,11 +66,11 @@
         <ul className="fuck">
           <HeartBeat row={1} col={1}/>
           <Clock row={1} col={2}/>
-          <Text row={1} col={3}/>
-          <Text widgetid="mywidget" row={1} col={4} initialTitle="Fuck you"/>
+          <Number row={1} col={3} initialTitle="Current valuation" initialInfo="In billions"/>
+          <Text widgetid="mywidget" row={1} col={4} initialTitle="Fuck you" initialText="Wat nu dan?"/>
           <Text widgetid="mywidget2" row={2} col={1} initialText="Fuck you"/>
           <Text widgetid="mywidget3" row={2} col={2}/>
-          <Text widgetid="mywidget4" row={2} col={3}/>
+          <Text widgetid="mywidget4" row={2} col={3} icon="icon-time" initialTitle="Blaat!"/>
           <Text widgetid="mywidget5" row={2} col={4} sizex="1" sizey="1"/>
         </ul>
       );

@@ -8,6 +8,17 @@ from gevent.queue import Queue
 from flask import Flask, Response
 from flask import render_template, send_from_directory
 import time
+import os
+
+def generate_jsx():
+    jsx = '/** @jsx React.DOM */\n'
+    for root, dirs, files in os.walk("widgets"):
+        for f in files:
+            if f.endswith('.jsx'):
+                fd = open(root + '/' + f)
+                jsx += '\n//jsx file: {0}\n'.format(f)
+                jsx += fd.read()
+    return jsx
 
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
 class ServerSentEvent(object):
@@ -40,6 +51,8 @@ def index():
 
 @app.route('/assets/<path:filename>')
 def assets(filename):
+    if filename == "application.js":
+        return generate_jsx()
     return send_from_directory('assets', filename)
 
 @app.route("/debug")
@@ -56,7 +69,6 @@ def publish(widget):
         }
         for sub in subscriptions[:]:
             sub.put(json.dumps(msg))
-    
     gevent.spawn(notify)
     
     return "OK"
@@ -77,6 +89,7 @@ def subscribe():
     return Response(gen(), mimetype="text/event-stream")
 
 if __name__ == "__main__":
+    #print generate_jsx()
     app.debug = True
     server = WSGIServer(("", 5000), app)
     server.serve_forever()
