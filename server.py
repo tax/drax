@@ -7,18 +7,32 @@ from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 from flask import Flask, Response
 from flask import render_template, send_from_directory
+from flask import abort, request
 import time
 import os
 
+AUTH_TOKEN = None
+
 def generate_jsx():
-    jsx = '/** @jsx React.DOM */\n'
+    res = '/** @jsx React.DOM */\n'
     for root, dirs, files in os.walk("widgets"):
         for f in files:
             if f.endswith('.jsx'):
                 fd = open(root + '/' + f)
-                jsx += '\n//jsx file: {0}\n'.format(f)
-                jsx += fd.read()
-    return jsx
+                res += '\n//jsx file: {0}\n'.format(f)
+                res += fd.read()
+    return res
+
+def merge_files(folder, extension, comment=''):
+    res = comment
+    for root, dirs, files in os.walk(folder):
+        for f in files:
+            if f.endswith(extension):
+                fd = open(root + '/' + f)
+                res += '\n//{0} file: {1}\n'.format(extension, f)
+                res += fd.read()
+    return res
+
 
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
 class ServerSentEvent(object):
@@ -44,34 +58,40 @@ class ServerSentEvent(object):
 app = Flask(__name__)
 subscriptions = []
 
-# Client code consumes like this.
 @app.route("/")
 def index():
     return render_template('index.html')
 
 @app.route('/assets/<path:filename>')
 def assets(filename):
-    if filename == "application.js":
-        return generate_jsx()
+    files = {
+        'application.js': {
+            'folder': 'assets/js',
+            'extension':'js'
+        },
+        'widgets.jsx': {
+            'folder': 'widgets', 
+            'extension': 'jsx',
+            'comment': '/** @jsx React.DOM */\n'
+        },
+    }
+    if filename in files.keys():
+        return merge_files(**files[filename])
     return send_from_directory('assets', filename)
 
-@app.route("/debug")
-def debug():
-    return "Currently %d subscriptions" % len(subscriptions)
-
-@app.route('/widget/<widget>')
+@app.route('/widgets/<widget>', methods=['POST'])
 def publish(widget):
-    #Dummy data - pick up from request for real data
+    data = json.loads(request.data)
+    if AUTH_TOKEN and data["auth_token"] != AUTH_TOKEN:
+        abort(401)
+    del data["auth_token"]
+    data['id'] = widget
+    data['updatedAt'] = time.time()
     def notify():
-        msg = {
-            'title' : time.time(),
-            'widget' : widget
-        }
         for sub in subscriptions[:]:
-            sub.put(json.dumps(msg))
-    gevent.spawn(notify)
-    
-    return "OK"
+            sub.put(json.dumps(data))
+    gevent.spawn(notify)    
+    return Response(status=204)
 
 @app.route("/subscribe")
 def subscribe():

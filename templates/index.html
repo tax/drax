@@ -3,11 +3,8 @@
   <head>
     <meta name="viewport" content="width=device-width">
     <title>My dashboard</title>
-    <script type="text/javascript" src="/assets/js/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="/assets/js/jquery.gridster.min.js"></script>    
-    <script type="text/javascript" src="/assets/js/react.min.js"></script>
-    <script type="text/javascript" src="/assets/js/JSXTransformer.js"></script> 
-    <script type="text/jsx" src="/assets/application.js"></script>
+    <script type="text/javascript" src="/assets/application.js"></script>
+    <script type="text/jsx" src="/assets/widgets.jsx"></script>
     <link rel="stylesheet" href="/assets/css/application.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
     <style>
@@ -30,6 +27,7 @@ var WidgetStore = {
     init: function(eventSource){
       var that = this;
       eventSource.onmessage = function(msg){
+        console.log(msg);
         var data = JSON.parse(msg.data);
         var cb = that._widgets[data.id];
         return cb(data);        
@@ -64,14 +62,14 @@ WidgetStore.init(evtSrc);
     render: function() {
       return (
         <ul className="fuck">
-          <HeartBeat row={1} col={1}/>
+          <HeartBeat widgetid="hb" row={1} col={1}/>
           <Clock row={1} col={2}/>
-          <Number row={1} col={3} initialTitle="Current valuation" initialInfo="In billions"/>
+          <Number widgetid="valuation" row={1} col={3} initialTitle="Current valuation" initialInfo="In billions"/>
           <Text widgetid="mywidget" row={1} col={4} initialTitle="Fuck you" initialText="Wat nu dan?"/>
           <Text widgetid="mywidget2" row={2} col={1} initialText="Fuck you"/>
           <Text widgetid="mywidget3" row={2} col={2}/>
           <Text widgetid="mywidget4" row={2} col={3} icon="icon-time" initialTitle="Blaat!"/>
-          <Text widgetid="mywidget5" row={2} col={4} sizex="1" sizey="1"/>
+          <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={4}/>
         </ul>
       );
     }
