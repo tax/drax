@@ -1,26 +1,19 @@
-var Meter = React.createClass({
+var List = React.createClass({
     propTypes : {
       widgetid: React.PropTypes.string.isRequired,
       row : React.PropTypes.number.isRequired,
       col : React.PropTypes.number.isRequired,
-      min : React.PropTypes.number,
-      max : React.PropTypes.number,
       sizex : React.PropTypes.number,
       sizey : React.PropTypes.number,
-      icon : React.PropTypes.string,
       initialTitle : React.PropTypes.string,
       initialInfo : React.PropTypes.string,
       initialText : React.PropTypes.string,
-      initialValue : React.PropTypes.number,
       style : React.PropTypes.string,
     },
     getDefaultProps : function() {
       return {
-        min: 0,
-        max: 100,
         sizex : 1,
         sizey : 1,
-        initialValue: 0,
       };
     },    
     getInitialState: function() {
@@ -28,46 +21,45 @@ var Meter = React.createClass({
         title: this.props.initialTitle,
         text: this.props.initialText,
         info: this.props.initialInfo,
-        value: this.props.initialValue,
+        items: [],
         updatedAt: ""
       };
     },  
     _onChange: function(data) { 
-      var from = this.state.value;
-      var to = data.value;
-      var that = this;
-
-      $({ n: from }).animate({ n: to}, {
-          duration: 1000,
-          step: function(now, fx) {
-            data.value = Math.ceil(now);
-            that.setState(data);
-            $(".meter").trigger('change');
-          }
-      });      
+      this.setState(data); 
     },
     componentDidMount: function() { 
-      var meter = $(".meter");
-      meter.attr("data-bgcolor", meter.css("background-color"));
-      meter.attr("data-fgcolor", meter.css("color"));
-      meter.knob();
       WidgetStore.addChangeListener(this.props.widgetid, this._onChange);
     }, 
     componentWillUnmount: function() { 
       WidgetStore.removeChangeListener(this.props.widgetid, this._onChange); 
     },
     render: function() {
+      var listItems = this.state.items.map(function (item) {
+        return <li>
+                <span className="label">{item.label}</span>
+                <span className="value">{item.value}</span>
+            </li>
+      });        
       return (
         <li className="gs_w" data-row={this.props.row} data-col={this.props.col} data-sizex={this.props.sizex} data-sizey={this.props.sizey}>
-          <div className={'widget widget-meter ' + (this.props.widgetid)}>
+          <div className={'widget widget-list ' + (this.props.widgetid)}>
             <h1 className="title">{this.state.title}</h1>
-            <input className="meter" value={this.state.value} data-min={this.props.min} data-max={this.props.max} data-angleoffset="-125" data-anglearc="250" data-width="200" data-readonly="true"/>
+            <ul className="list-nostyle">
+              {listItems}
+            </ul>
             <p className="more-info">{this.state.info}</p>
             <p className="updated-at">{this.state.updatedAt}</p>
-            <i className={'icon-background ' + (this.props.icon)}></i>
           </div>
         </li>        
       );
     }    
-  });
-
+});
+/*
+<ol>
+  <li data-foreach-item="items">
+    <span class="label" data-bind="item.label"></span>
+    <span class="value" data-bind="item.value"></span>
+  </li>
+</ol>
+*/

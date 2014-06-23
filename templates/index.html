@@ -28,10 +28,21 @@ var WidgetStore = {
       var that = this;
       eventSource.onmessage = function(msg){
         console.log(msg);
-        var data = JSON.parse(msg.data);
+        var data = JSON.parse(msg.data); 
         var cb = that._widgets[data.id];
-        return cb(data);        
+        return cb(that.formatData(data));        
       }
+    },
+
+    formatData: function(data){
+      var timestamp = new Date();
+      if('updatedAt' in data){
+        timestamp = new Date(data.updatedAt * 1000);
+      }
+      var hours = timestamp.getHours();
+      var minutes = ("0" + timestamp.getMinutes()).slice(-2);
+      data.updatedAt = "Last updated at "+ hours +":" + minutes;
+      return data;
     },
 
     messageHandler: function(msg){
@@ -65,11 +76,10 @@ WidgetStore.init(evtSrc);
           <HeartBeat widgetid="hb" row={1} col={1}/>
           <Clock row={1} col={2}/>
           <Number widgetid="valuation" row={1} col={3} initialTitle="Current valuation" initialInfo="In billions"/>
-          <Text widgetid="mywidget" row={1} col={4} initialTitle="Fuck you" initialText="Wat nu dan?"/>
+          <List widgetid="mylist" row={1} col={4} sizey={2}/>
           <Text widgetid="mywidget2" row={2} col={1} initialText="Fuck you"/>
-          <Text widgetid="mywidget3" row={2} col={2}/>
-          <Text widgetid="mywidget4" row={2} col={3} icon="icon-time" initialTitle="Blaat!"/>
-          <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={4}/>
+          <Text widgetid="mywidget" row={1} col={2} initialTitle="Fuck you" initialText="Wat nu dan?"/>
+          <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={3}/>
         </ul>
       );
     }
