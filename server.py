@@ -13,16 +13,6 @@ import os
 
 AUTH_TOKEN = None
 
-def generate_jsx():
-    res = '/** @jsx React.DOM */\n'
-    for root, dirs, files in os.walk("widgets"):
-        for f in files:
-            if f.endswith('.jsx'):
-                fd = open(root + '/' + f)
-                res += '\n//jsx file: {0}\n'.format(f)
-                res += fd.read()
-    return res
-
 def merge_files(folder, extension, comment=''):
     res = comment
     for root, dirs, files in os.walk(folder):
