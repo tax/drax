@@ -5,7 +5,11 @@ import json
 # r = requests.post('http://localhost:5000/widgets/hb', data=data)
 # print r.status_code
 # print "|"+r.content+"|"
-data = '{ "auth_token": "YOUR_AUTH_TOKEN", "value":'+str(randint(0,100))+' ,"id":"synergy"}'
+# data = '{ "auth_token": "YOUR_AUTH_TOKEN", "value":'+str(randint(0,100))+' ,"id":"synergy"}'
+# r = requests.post('http://localhost:5000/widgets/synergy', data=data)
+
+
+data = '{ "auth_token": "YOUR_AUTH_TOKEN", "text":"asasas" ,"id":"synergy", "value":20}'
 r = requests.post('http://localhost:5000/widgets/synergy', data=data)
 
 
@@ -17,7 +21,7 @@ data = {
         {'value':'21','label':'My label 2'}
     ]
 }
-r = requests.post('http://localhost:5000/widgets/mylist', data=json.dumps(data))
+#r = requests.post('http://localhost:5000/widgets/mylist', data=json.dumps(data))
 
 # data = '{ auth_token": "YOUR_AUTH_TOKEN", "text": "nununu"}'
 # r = requests.post('http://localhost:3030/widgets/welcome', data=data)
