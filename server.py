@@ -13,6 +13,7 @@ import os
 
 AUTH_TOKEN = None
 
+
 def merge_files(folder, extension, comment=''):
     res = comment
     for root, dirs, files in os.walk(folder):
@@ -32,35 +33,37 @@ class ServerSentEvent(object):
         self.event = None
         self.id = None
         self.desc_map = {
-            self.data : "data",
-            self.event : "event",
-            self.id : "id"
+            self.data: "data",
+            self.event: "event",
+            self.id: "id"
         }
 
     def encode(self):
         if not self.data:
             return ""
-        lines = ["%s: %s" % (v, k) 
+        lines = ["%s: %s" % (v, k)
                  for k, v in self.desc_map.iteritems() if k]
-        
+
         return "%s\n\n" % "\n".join(lines)
 
 app = Flask(__name__)
 subscriptions = []
 
+
 @app.route("/")
 def index():
     return render_template('index.html')
+
 
 @app.route('/assets/<path:filename>')
 def assets(filename):
     files = {
         'application.js': {
             'folder': 'assets/js',
-            'extension':'js'
+            'extension': 'js'
         },
         'widgets.jsx': {
-            'folder': 'widgets', 
+            'folder': 'widgets',
             'extension': 'jsx',
             'comment': '/** @jsx React.DOM */\n'
         },
@@ -68,6 +71,7 @@ def assets(filename):
     if filename in files.keys():
         return merge_files(**files[filename])
     return send_from_directory('assets', filename)
+
 
 @app.route('/widgets/<widget>', methods=['POST'])
 def publish(widget):
@@ -77,11 +81,13 @@ def publish(widget):
     del data["auth_token"]
     data['id'] = widget
     data['updatedAt'] = time.time()
+
     def notify():
         for sub in subscriptions[:]:
             sub.put(json.dumps(data))
-    gevent.spawn(notify)    
+    gevent.spawn(notify)
     return Response(status=204)
+
 
 @app.route("/subscribe")
 def subscribe():
@@ -93,15 +99,18 @@ def subscribe():
                 result = q.get()
                 ev = ServerSentEvent(str(result))
                 yield ev.encode()
-        except GeneratorExit: # Or maybe use flask signals
+        except GeneratorExit:
             subscriptions.remove(q)
 
     return Response(gen(), mimetype="text/event-stream")
 
-if __name__ == "__main__":
-    #print generate_jsx()
+
+def main():
     app.debug = True
     server = WSGIServer(("", 5000), app)
     server.serve_forever()
-    # Then visit http://localhost:5000 to subscribe 
+
+if __name__ == "__main__":
+    main()
+    # Then visit http://localhost:5000 to subscribe
     # and send messages by visiting http://localhost:5000/publish

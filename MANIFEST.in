@@ -1,0 +1,4 @@
+include LICENSE.txt README.md *.py
+recursive-include assets *.*
+recursive-include templates *.*
+recursive-include widgets *.*
