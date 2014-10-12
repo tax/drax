@@ -1,4 +1,4 @@
 include LICENSE.txt README.md *.py
-recursive-include assets *.*
-recursive-include templates *.*
-recursive-include widgets *.*
+recursive-include dashboard/assets *.*
+recursive-include dashboard/templates *.*
+recursive-include dashboard/widgets *.*

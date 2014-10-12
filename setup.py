@@ -22,7 +22,7 @@ setup(
     packages=['dashboard'],
     #scripts=['bin/mycommand'],
     entry_points={
-        'console_scripts': ['dashboardtest=server:main'],
+        'console_scripts': ['dashboardtest=dashboard.server:main'],
     },
     install_requires=[
         'gevent>=1.0.0',
