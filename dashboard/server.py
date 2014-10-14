@@ -1,116 +1,105 @@
-# author: oskar.blom@gmail.com
-#
-# Make sure your gevent version is >= 1.0
-import json
-import gevent
-from gevent.wsgi import WSGIServer
-from gevent.queue import Queue
-from flask import Flask, Response
-from flask import render_template, send_from_directory
-from flask import abort, request
 import time
+import json
 import os
+from tornado.ioloop import IOLoop, PeriodicCallback
+from tornado.web import RequestHandler, Application, StaticFileHandler
+from tornado.websocket import WebSocketHandler
+
 
 AUTH_TOKEN = None
+PATH = os.path.abspath(os.path.dirname(__file__))
+assets = {
+    'main.js': {
+        'folder': 'assets/js',
+        'mimetype': 'application/x-javascript',
+        'extension': 'js'
+    },
+    'main.css': {
+        'folder': 'widgets',
+        'mimetype': 'text/css',
+        'extension': 'css'
+    },
+    'widgets.jsx': {
+        'folder': 'widgets',
+        'mimetype': 'application/x-javascript',
+        'extension': 'jsx',
+        'comment': '/** @jsx React.DOM */\n'
+    },
+}
+clients = []
+messages = {}
 
 
-def merge_files(folder, extension, comment=''):
-    res = comment
-    for root, dirs, files in os.walk(folder):
+def merge_files(folder, extension, **kwargs):
+    res = kwargs.get('comment', '')
+    for root, dirs, files in os.walk(PATH + '/' + folder):
         for f in files:
             if f.endswith(extension):
                 fd = open(root + '/' + f)
-                res += '\n//{0} file: {1}\n'.format(extension, f)
+                res += '\n/* {0} file: {1} */\n'.format(extension, f)
                 res += fd.read()
     return res
 
 
-# SSE "protocol" is described here: http://mzl.la/UPFyxY
-class ServerSentEvent(object):
-
-    def __init__(self, data):
-        self.data = data
-        self.event = None
-        self.id = None
-        self.desc_map = {
-            self.data: "data",
-            self.event: "event",
-            self.id: "id"
-        }
-
-    def encode(self):
-        if not self.data:
-            return ""
-        lines = ["%s: %s" % (v, k)
-                 for k, v in self.desc_map.iteritems() if k]
-
-        return "%s\n\n" % "\n".join(lines)
-
-app = Flask(__name__)
-subscriptions = []
+class MainHandler(RequestHandler):
+    def get(self):
+        self.render("templates/index.html")
 
 
-@app.route("/")
-def index():
-    return render_template('index.html')
+class AssetHandler(RequestHandler):
+    def get(self, filename):
+        if filename in assets.keys():
+            asset = assets[filename]
+            self.set_header('Content-Type', asset['mimetype'])
+            return self.write(merge_files(**asset))
+        return self.send_error(404)
 
 
-@app.route('/assets/<path:filename>')
-def assets(filename):
-    files = {
-        'application.js': {
-            'folder': 'assets/js',
-            'extension': 'js'
-        },
-        'widgets.jsx': {
-            'folder': 'widgets',
-            'extension': 'jsx',
-            'comment': '/** @jsx React.DOM */\n'
-        },
-    }
-    if filename in files.keys():
-        return merge_files(**files[filename])
-    return send_from_directory('assets', filename)
+class PublishHandler(RequestHandler):
+    def initialize(self, clients, messages):
+        self.clients = clients
+        self.messages = messages
+
+    def post(self, widget):
+        data = json.loads(self.request.body)
+        if AUTH_TOKEN and data['auth_token'] != AUTH_TOKEN:
+            return self.send_error(status_code=401)
+        data.pop('auth_token', None)
+        data['id'] = widget
+        data['updatedAt'] = time.time()
+        msg = json.dumps(data)
+        for client in self.clients:
+            client.write_message(msg)
+        self.messages[widget] = msg
+        self.set_status(204)
 
 
-@app.route('/widgets/<widget>', methods=['POST'])
-def publish(widget):
-    data = json.loads(request.data)
-    if AUTH_TOKEN and data["auth_token"] != AUTH_TOKEN:
-        abort(401)
-    del data["auth_token"]
-    data['id'] = widget
-    data['updatedAt'] = time.time()
+class EventHandler(WebSocketHandler):
+    def open(self, *args):
+        # Send current state of widgets on connect
+        for msg in messages.values():
+            self.write_message(msg)
+        clients.append(self)
 
-    def notify():
-        for sub in subscriptions[:]:
-            sub.put(json.dumps(data))
-    gevent.spawn(notify)
-    return Response(status=204)
+    def on_close(self):
+        clients.remove(self)
 
-
-@app.route("/subscribe")
-def subscribe():
-    def gen():
-        q = Queue()
-        subscriptions.append(q)
-        try:
-            while True:
-                result = q.get()
-                ev = ServerSentEvent(str(result))
-                yield ev.encode()
-        except GeneratorExit:
-            subscriptions.remove(q)
-
-    return Response(gen(), mimetype="text/event-stream")
-
+def foo():
+    print 'Hallo'
 
 def main():
-    app.debug = True
-    server = WSGIServer(("", 5000), app)
-    server.serve_forever()
+    args = dict(clients=clients, messages=messages)
+    app = Application([
+        (r'/', MainHandler),
+        (r'/subscribe', EventHandler),
+        (r'/app/(.*)', AssetHandler),
+        (r'/assets/(.*)', StaticFileHandler, dict(path=PATH + '/assets/')),
+        (r'/widgets/([^/]+)', PublishHandler, args),
+    ])
+    app.listen(8888)
+    PeriodicCallback(foo, 2000).start()
+    IOLoop.instance().start()
+
 
 if __name__ == "__main__":
     main()
-    # Then visit http://localhost:5000 to subscribe
-    # and send messages by visiting http://localhost:5000/publish

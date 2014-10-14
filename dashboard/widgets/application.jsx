@@ -38,7 +38,7 @@ var WidgetStore = {
     
 };
 
-var evtSrc = new EventSource("/subscribe");
+var evtSrc = new WebSocket("ws://" + location.host + "/subscribe");
 WidgetStore.init(evtSrc);
 
 
