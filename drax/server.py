@@ -7,7 +7,7 @@ from tornado.websocket import WebSocketHandler
 
 
 AUTH_TOKEN = None
-PATH = os.path.abspath(os.path.dirname(__file__))
+PATH = os.getcwd()
 assets = {
     'main.js': {
         'folder': 'assets/js',
@@ -43,7 +43,7 @@ def merge_files(folder, extension, **kwargs):
 
 class MainHandler(RequestHandler):
     def get(self):
-        self.render("templates/index.html")
+        self.render(PATH + "/templates/index.html")
 
 
 class AssetHandler(RequestHandler):
@@ -84,19 +84,17 @@ class EventHandler(WebSocketHandler):
     def on_close(self):
         clients.remove(self)
 
+
 def main():
     args = dict(clients=clients, messages=messages)
     app = Application([
         (r'/', MainHandler),
         (r'/subscribe', EventHandler),
         (r'/app/(.*)', AssetHandler),
-        (r'/assets/(.*)', StaticFileHandler, dict(path=PATH + '/assets/')),
+        (r'/assets/(.*)', StaticFileHandler, dict(path=PATH + 'assets/')),
         (r'/widgets/([^/]+)', PublishHandler, args),
     ])
     app.listen(8888)
+    print 'Starting server on port 8888'
     #PeriodicCallback(foo, 2000).start()
     IOLoop.instance().start()
-
-
-if __name__ == "__main__":
-    main()
