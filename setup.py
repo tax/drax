@@ -10,22 +10,21 @@ if sys.argv[-1] == 'publish':
 
 
 setup(
-    name='dashboard',
+    name='drax',
     version='0.1.0',
     author='tax',
     author_email='paultax@gmail.com',
     include_package_data=True,
     description='Dashboard inspired by dashing build with python and react',
     long_description=open('README.md').read(),
-    url='http://github.com/tax/dashboard',
+    url='http://github.com/tax/drax',
     license='MIT',
-    packages=['dashboard'],
+    packages=['drax'],
     #scripts=['bin/mycommand'],
     entry_points={
-        'console_scripts': ['dashboardtest=dashboard.server:main'],
+        'console_scripts': ['drax=drax.commands:main'],
     },
     install_requires=[
-        'gevent>=1.0.0',
-        'Flask>=0.10.1',
+        'tornado>=4.0.2',
     ],
     zip_safe=False)
