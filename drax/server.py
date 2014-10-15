@@ -1,6 +1,7 @@
 import time
 import json
 import os
+import imp
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application, StaticFileHandler
 from tornado.websocket import WebSocketHandler
@@ -85,16 +86,24 @@ class EventHandler(WebSocketHandler):
         clients.remove(self)
 
 
+def start_jobs():
+    jobs = {}
+    for f in os.listdir(PATH + '/jobs'):
+        if f.endswith('.py'):
+            jobs[f] = imp.load_source(f, PATH + '/jobs/' + f)
+            PeriodicCallback(jobs[f].callback, jobs[f].callback_time).start()
+
+
 def main():
     args = dict(clients=clients, messages=messages)
     app = Application([
         (r'/', MainHandler),
         (r'/subscribe', EventHandler),
         (r'/app/(.*)', AssetHandler),
-        (r'/assets/(.*)', StaticFileHandler, dict(path=PATH + 'assets/')),
+        (r'/assets/(.*)', StaticFileHandler, dict(path=PATH + '/assets/')),
         (r'/widgets/([^/]+)', PublishHandler, args),
-    ])
+    ], compiled_template_cache=False)
     app.listen(8888)
     print 'Starting server on port 8888'
-    #PeriodicCallback(foo, 2000).start()
+    start_jobs()
     IOLoop.instance().start()

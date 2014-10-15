@@ -28,7 +28,7 @@ def main():
 
 
 def init():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         print 'No project name given to create directory'
         print 'Example: drax init mydashboard'
 
