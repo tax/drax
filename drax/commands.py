@@ -14,7 +14,7 @@ usage = '''Commands:
 def main():
     if len(sys.argv) == 1:
         print usage
-        sys.exit()
+        return
 
     if sys.argv[1].lower() == 'init':
         init()
@@ -24,13 +24,14 @@ def main():
         print usage
     else:
         print usage
-        print 'Could not find command "{0}".'.format(sys.argv[0])
+        print 'Could not find command "{0}".'.format(sys.argv[1])
 
 
 def init():
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         print 'No project name given to create directory'
         print 'Example: drax init mydashboard'
+        return
 
     project = sys.argv[2]
     project_dir = os.getcwd() + '/' + project
@@ -58,5 +59,5 @@ def start():
         if not os.path.exists(os.getcwd() + '/' + d):
             print 'This is not a drax project, directory "{}"'\
                   ' is missing'.format(d)
-            sys.exit()
+            return
     server.main()

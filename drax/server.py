@@ -106,4 +106,7 @@ def main():
     app.listen(8888)
     print 'Starting server on port 8888'
     start_jobs()
-    IOLoop.instance().start()
+    try:
+        IOLoop.instance().start()
+    except KeyboardInterrupt:
+        IOLoop.instance().stop()
