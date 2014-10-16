@@ -1,8 +1,11 @@
 import unittest
 import sys
+import os
 from cStringIO import StringIO
+import requests
+from tornado.testing import AsyncHTTPTestCase
 
-from drax import commands
+from drax import commands, server
 
 
 class TestDraxCommandline(unittest.TestCase):
@@ -43,6 +46,27 @@ class TestDraxCommandline(unittest.TestCase):
         sys.argv = ['drax', 'start']
         commands.main()
         self.assertTrue('This is not a drax project' in sys.stdout.getvalue())
+
+
+class TestDraxServer(AsyncHTTPTestCase):
+
+    def get_app(self):
+        path = os.getcwd() + '/drax'
+        return server.make_app(path, auth_token=None)
+
+    def test_index(self):
+        response = self.fetch('/', method='GET')
+        self.assertEqual(200, response.code)
+        self.assertTrue('<title>Drax</title>' in response.body)
+
+    def test_assets(self):
+        assets = ['/app/main.js', '/app/widgets.jsx', '/app/main.css']
+        results = [self.fetch(a, method='GET').code for a in assets]
+        self.assertTrue(len(results) == 3)
+        self.assertTrue(results, [200, 200, 200])
+
+    def test_websocket(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()

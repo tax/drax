@@ -60,4 +60,4 @@ def start():
             print 'This is not a drax project, directory "{}"'\
                   ' is missing'.format(d)
             return
-    server.main()
+    server.main(os.getcwd())
