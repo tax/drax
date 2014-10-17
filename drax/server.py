@@ -30,17 +30,17 @@ class AssetHandler(RequestHandler):
     def get(self, filename):
         assets = {
             'main.js': {
-                'folder': self.path + 'assets/js',
+                'folder': self.path + '/assets/js',
                 'mimetype': 'application/x-javascript',
                 'extension': 'js'
             },
             'main.css': {
-                'folder': self.path + 'widgets',
+                'folder': self.path + '/widgets',
                 'mimetype': 'text/css',
                 'extension': 'css'
             },
             'widgets.jsx': {
-                'folder': self.path + 'widgets',
+                'folder': self.path + '/widgets',
                 'mimetype': 'application/x-javascript',
                 'extension': 'jsx',
                 'comment': '/** @jsx React.DOM */\n'
