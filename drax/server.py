@@ -10,7 +10,7 @@ from tornado.websocket import WebSocketHandler
 def merge_files(folder, extension, **kwargs):
     res = kwargs.get('comment', '')
     for root, dirs, files in os.walk(folder):
-        for f in files:
+        for f in sorted(files):
             if f.endswith(extension):
                 fd = open(root + '/' + f)
                 res += '\n/* {0} file: {1} */\n'.format(extension, f)
