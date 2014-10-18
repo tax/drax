@@ -57,11 +57,11 @@ class PublishHandler(RequestHandler):
     def initialize(self, clients, messages, auth_token):
         self.clients = clients
         self.messages = messages
-        self.auth_token = self.application.auth_token
+        self.auth_token = auth_token
 
     def post(self, widget):
         data = json.loads(self.request.body)
-        if self.auth_token and data['auth_token'] != self.auth_token:
+        if self.auth_token and data.get('auth_token', '') != self.auth_token:
             return self.send_error(status_code=401)
         data.pop('auth_token', None)
         data['id'] = widget
@@ -89,6 +89,9 @@ messages = {}
 
 
 def make_app(path, auth_token):
+    # Reset global values for testing
+    # clients = []
+    # messages = {}
     args = dict(clients=clients, messages=messages, auth_token=auth_token)
     urls = [
         (r'/', MainHandler),

@@ -2,8 +2,9 @@ import unittest
 import sys
 import os
 from cStringIO import StringIO
-import requests
-from tornado.testing import AsyncHTTPTestCase
+import json
+import tornado.testing
+from tornado.websocket import websocket_connect
 
 from drax import commands, server
 
@@ -11,7 +12,11 @@ from drax import commands, server
 class TestDraxCommandline(unittest.TestCase):
 
     def setUp(self):
+        self.original_stdout = sys.stdout
         sys.stdout = StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.original_stdout
 
     def test_main(self):
         # make sure the shuffled sequence does not lose any elements
@@ -48,11 +53,11 @@ class TestDraxCommandline(unittest.TestCase):
         self.assertTrue('This is not a drax project' in sys.stdout.getvalue())
 
 
-class TestDraxServer(AsyncHTTPTestCase):
+class TestDraxServer(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         path = os.getcwd() + '/drax'
-        return server.make_app(path, auth_token=None)
+        return server.make_app(path, auth_token='secret')
 
     def test_index(self):
         response = self.fetch('/', method='GET')
@@ -61,12 +66,58 @@ class TestDraxServer(AsyncHTTPTestCase):
 
     def test_assets(self):
         assets = ['/app/main.js', '/app/widgets.jsx', '/app/main.css']
-        results = [self.fetch(a, method='GET').code for a in assets]
-        self.assertTrue(len(results) == 3)
-        self.assertTrue(results, [200, 200, 200])
+        results = [self.fetch(a, method='GET') for a in assets]
+        self.assertEqual(3, len(results))
+        self.assertEqual([200, 200, 200], [r.code for r in results])
 
+        # Body should contain more then a KB of data
+        has_content = [len(r.body) > 1024 for r in results]
+        self.assertEqual([True, True, True], has_content)
+
+        result = self.fetch('/app/wrong.js', method='GET')
+        self.assertEqual(404, result.code)
+
+    def test_authentication(self):
+        data = {
+            'auth_token': 'dontknow', 'value': 99, 'id': 'mywidget'
+        }
+        body = json.dumps(data)
+        response = self.fetch('/widgets/mywidget', method='POST', body=body)
+        self.assertEqual(401, response.code)
+
+        del data['auth_token']
+        body = json.dumps(data)
+        response = self.fetch('/widgets/mywidget', method='POST', body=body)
+        self.assertEqual(401, response.code)
+
+        data['auth_token'] = 'secret'
+        body = json.dumps(data)
+        response = self.fetch('/widgets/mywidget', method='POST', body=body)
+        self.assertEqual(204, response.code)
+
+        event = json.loads(server.messages['mywidget'])
+        self.assertIn('updatedAt', event, 'updatedAt should be added')
+        self.assertNotIn('auth_token', event, 'auth_token must be removed')
+
+
+class TestDraxServerEvents(tornado.testing.AsyncHTTPTestCase):
+
+    def get_app(self):
+        path = os.getcwd() + '/drax'
+        server.messages = {}
+        server.clients = []
+        return server.make_app(path, auth_token='secret')
+
+    @tornado.testing.gen_test
     def test_websocket(self):
-        pass
+        url = 'ws://localhost:%d/subscribe' % self.get_http_port()
+        ws = yield websocket_connect(url, io_loop=self.io_loop)
+        self.assertEqual(1, len(server.clients))
+
+        server.clients[0].write_message("My event")
+        response = yield ws.read_message()
+        self.assertEqual('My event', response)
+
 
 if __name__ == '__main__':
     unittest.main()

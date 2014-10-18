@@ -1,6 +1,29 @@
-Is travis fired automagically once more?
+#Drax dashboard
 
-To install
-pip install git+https://github.com/tax/drax.git
+Drax is a python and react implemenation of the beautiful [dashing](http://shopify.github.io/dashing/) app.
 
+
+- Tested with python 2.7
+
+## How to use drax
+
+After you installed drax:
+
+```
+    $ drax init mydashboard
+    $ cd mydashboard
+    $ drax start
+```
+
+Then go to http://localhost:8888/
+
+
+## How to create a dashboard
+
+## Installation
+Installing drax is simple with pip:
+
+```
+    $ pip install drax
+```
 [![Build Status](https://travis-ci.org/tax/drax.svg?branch=master)](https://travis-ci.org/tax/drax)
