@@ -3,7 +3,7 @@ import sys
 import shutil
 import server
 
-dirs = ['widgets', 'templates', 'assets']
+DIRS = ['widgets', 'templates', 'assets']
 usage = '''Commands:
   drax help                 # Shows this message
   drax init PROJECT_NAME    # Sets up new dashboard in directory
@@ -42,7 +42,7 @@ def init():
 
     print 'Creating project {}'.format(project)
     root = os.path.abspath(os.path.dirname(__file__))
-    for d in dirs:
+    for d in DIRS:
         src = root + '/' + d
         dest = project_dir + '/' + d
         try:
@@ -55,7 +55,7 @@ def init():
 
 
 def start():
-    for d in dirs:
+    for d in DIRS:
         if not os.path.exists(os.getcwd() + '/' + d):
             print 'This is not a drax project, directory "{}"'\
                   ' is missing'.format(d)

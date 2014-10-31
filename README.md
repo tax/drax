@@ -2,9 +2,6 @@
 
 Drax is a python and react implemenation of the beautiful [dashing](http://shopify.github.io/dashing/) app.
 
-
-- Tested with python 2.7
-
 ## How to use drax
 
 After you installed drax:
@@ -20,10 +17,20 @@ Then go to http://localhost:8888/
 
 ## How to create a dashboard
 
+
+
 ## Installation
-Installing drax is simple with pip:
+Installing drax is easy with pip:
 
 ```
     $ pip install drax
 ```
+
+## Testing
+To run tests:
+```
+    $ python test.py
+```
+Tested with python 2.7
+
 [![Build Status](https://travis-ci.org/tax/drax.svg?branch=master)](https://travis-ci.org/tax/drax)

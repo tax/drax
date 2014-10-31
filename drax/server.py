@@ -89,15 +89,12 @@ messages = {}
 
 
 def make_app(path, auth_token):
-    # Reset global values for testing
-    # clients = []
-    # messages = {}
     args = dict(clients=clients, messages=messages, auth_token=auth_token)
     urls = [
         (r'/', MainHandler),
         (r'/subscribe', EventHandler),
         (r'/app/(.*)', AssetHandler, dict(path=path)),
-        (r'/assets/(.*)', StaticFileHandler),
+        (r'/assets/(.*)', StaticFileHandler, dict(path=path + '/assets')),
         (r'/widgets/([^/]+)', PublishHandler, args),
     ]
     return Application(
@@ -124,3 +121,6 @@ def main(path, port=8888, auth_token=None):
         IOLoop.instance().start()
     except KeyboardInterrupt:
         IOLoop.instance().stop()
+
+if __name__ == '__main__':
+    main(os.getcwd() + '/drax')

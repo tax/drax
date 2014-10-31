@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta name="viewport" content="width=device-width">
     <title>Drax</title>
     <script type="text/javascript" src="/app/main.js"></script>
     <script type="text/jsx" src="/app/widgets.jsx"></script>
     <link rel="stylesheet" href="/app/main.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
     <style>
     .gridster > ul{
       height: 900px; 
       position: relative;
+      width: 1440px;
     }
     </style>
   </head>
   <body>
     <div id="container">
-      <div style="width: 1440px;" class="gridster ready"></div>
+      <div class="gridster ready"></div>
     </div>
-    <div class="testtest"></div>
   </body>
+
   <script type="text/jsx">
   /** @jsx React.DOM */
   var WidgetList = React.createClass({
@@ -27,8 +27,8 @@
       return (
         <ul>
           <Clock row={1} col={1}/>
-          <HeartBeat widgetid="hb" row={1} col={1}/>
-          <Text widgetid="mywidget3" row={1} col={4} initialTitle="Fuck you" initialText="Wat nu dan?"/>
+          <HeartBeat widgetid="hearthbeat" row={1} col={1}/>
+          <Text widgetid="mywidget3" row={1} col={4} initialTitle="This is the title" initialText="This is my initial text...."/>
           <List widgetid="mylist" row={1} col={3} sizey={2}/>
           <Number widgetid="valuation" row={2} col={1} initialTitle="Current valuation" initialInfo="In billions"/>
           <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={2}/>
@@ -47,8 +47,6 @@
     });
   });
 
-
   </script>
-
 
 </html>

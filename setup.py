@@ -20,7 +20,6 @@ setup(
     url='http://github.com/tax/drax',
     license='MIT',
     packages=['drax'],
-    #scripts=['bin/mycommand'],
     entry_points={
         'console_scripts': ['drax=drax.commands:main'],
     },
