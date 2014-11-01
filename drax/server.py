@@ -8,7 +8,7 @@ from tornado.websocket import WebSocketHandler
 
 
 def merge_files(folder, extension, **kwargs):
-    res = kwargs.get('comment', '')
+    res = ''
     for root, dirs, files in os.walk(folder):
         for f in sorted(files):
             if f.endswith(extension):
@@ -43,7 +43,6 @@ class AssetHandler(RequestHandler):
                 'folder': self.path + '/widgets',
                 'mimetype': 'application/x-javascript',
                 'extension': 'jsx',
-                'comment': '/** @jsx React.DOM */\n'
             },
         }
         if filename in assets.keys():

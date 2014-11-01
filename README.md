@@ -1,6 +1,6 @@
 #Drax dashboard
 
-Drax is a python and react implemenation of the beautiful [dashing](http://shopify.github.io/dashing/) app.
+Drax is a python and react implementation of the beautiful [dashing](http://shopify.github.io/dashing/) app.
 
 ## How to use drax
 

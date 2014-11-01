@@ -93,3 +93,37 @@ var Widget = React.createClass({
       );
     }    
   });
+
+
+var Dashboard = React.createClass({
+    propTypes : {
+      widgetHeight : React.PropTypes.number,
+      widgetWidth : React.PropTypes.number,
+      margins : React.PropTypes.arrayOf(React.PropTypes.number),
+    },
+
+    getDefaultProps : function() {
+      return {
+        widgetHeight : 450,
+        widgetWidth : 360,
+        margins: [5,5] 
+      };
+    },  
+
+    componentDidMount: function() {
+      $(".gridster > ul").gridster({
+        widget_margins: this.props.margins,
+        widget_base_dimensions: [this.props.widgetWidth, this.props.widgetHeight]
+      });
+    },
+
+    render: function() {
+      return (
+        <div className="gridster ready">
+          <ul>
+            {this.props.children}
+          </ul>
+        </div>
+      );
+    }
+});

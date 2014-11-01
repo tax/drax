@@ -6,46 +6,23 @@
     <script type="text/javascript" src="/app/main.js"></script>
     <script type="text/jsx" src="/app/widgets.jsx"></script>
     <link rel="stylesheet" href="/app/main.css">
-    <style>
-    .gridster > ul{
-      height: 900px; 
-      position: relative;
-      width: 1440px;
-    }
-    </style>
   </head>
   <body>
-    <div id="container">
-      <div class="gridster ready"></div>
-    </div>
+    <div id="container"></div>
   </body>
 
   <script type="text/jsx">
-  /** @jsx React.DOM */
-  var WidgetList = React.createClass({
-    render: function() {      
-      return (
-        <ul>
-          <Clock row={1} col={1}/>
-          <HeartBeat widgetid="hearthbeat" row={1} col={1}/>
-          <Text widgetid="mywidget3" row={1} col={4} initialTitle="This is the title" initialText="This is my initial text...."/>
-          <List widgetid="mylist" row={1} col={3} sizey={2}/>
-          <Number widgetid="valuation" row={2} col={1} initialTitle="Current valuation" initialInfo="In billions"/>
-          <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={2}/>
-          <Image widgetid="myimage7" row={2} col={4} src="http://dashingdemo.herokuapp.com/assets/logo.png"/>
-        </ul>
-      );
-    }
-  });
-  
-  React.renderComponent(<WidgetList/>, $('.gridster').get(0) );
-
-  $(function(){ //DOM Ready 
-    $(".gridster > ul").gridster({
-      widget_margins: [5, 5],
-      widget_base_dimensions: [360, 450]
-    });
-  });
+  React.render(
+    <Dashboard>
+      <Clock widgetid="clock" row={1} col={1}/>
+      <HeartBeat widgetid="hearthbeat" row={1} col={1}/>
+      <Text widgetid="mywidget3" row={1} col={4} initialTitle="This is the title" initialText="This is my initial text...."/>
+      <List widgetid="mylist" row={1} col={3} sizey={2}/>
+      <Number widgetid="valuation" row={2} col={1} initialTitle="Current valuation" initialInfo="In billions"/>
+      <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={2}/>
+      <Image widgetid="myimage7" row={2} col={4} src="http://dashingdemo.herokuapp.com/assets/logo.png"/>
+    </Dashboard>,
+    document.getElementById('container'));
 
   </script>
 
