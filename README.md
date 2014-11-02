@@ -44,6 +44,30 @@ If you want to add more dashboards copy *index.html* to a new html file in the t
 If you created a new dashboard *status.html* it will be available on http://localhost:8888/status **(Notice that this is without the ".html")**.
 
 
+## How get data into widgets
+Your widgets can be updated directly over HTTP. Post the data you want in json to /widgets/widget_id. 
+Example
+
+```
+curl -d '{ "auth_token": "YOUR_AUTH_TOKEN", "text": "Some new text..."}' http://localhost:8888/widgets/text
+```
+or a python example:
+
+```python
+import json
+import requests
+
+url = 'http://localhost:8888/widgets/text'
+data = {
+    'auth_token': 'YOUR_AUTH_TOKEN',
+    'text': 'Some new text...',
+    'id': 'text'
+}
+
+requests.post(url, data=json.dumps(data))
+
+```
+
 ## How to create a job
 Every file with the .py extension in the jobs folder is loaded as a job and executed periodically. 
 
