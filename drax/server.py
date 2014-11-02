@@ -7,49 +7,45 @@ from tornado.web import RequestHandler, Application, StaticFileHandler
 from tornado.websocket import WebSocketHandler
 
 
-def merge_files(folder, extension, **kwargs):
-    res = ''
-    for root, dirs, files in os.walk(folder):
-        for f in sorted(files):
-            if f.endswith(extension):
-                fd = open(root + '/' + f)
-                res += '\n/* {0} file: {1} */\n'.format(extension, f)
-                res += fd.read()
-    return res
-
-
 class MainHandler(RequestHandler):
-    def get(self):
-        self.render("index.html")
+    assets = {
+        'app/main.js': {
+            'folder': '/assets/js',
+            'mimetype': 'application/x-javascript',
+            'extension': 'js'
+        },
+        'app/main.css': {
+            'folder': '/widgets',
+            'mimetype': 'text/css',
+            'extension': 'css'
+        },
+        'app/widgets.jsx': {
+            'folder': '/widgets',
+            'mimetype': 'application/x-javascript',
+            'extension': 'jsx',
+        },
+    }
 
-
-class AssetHandler(RequestHandler):
     def initialize(self, path):
         self.path = path
 
     def get(self, filename):
-        assets = {
-            'main.js': {
-                'folder': self.path + '/assets/js',
-                'mimetype': 'application/x-javascript',
-                'extension': 'js'
-            },
-            'main.css': {
-                'folder': self.path + '/widgets',
-                'mimetype': 'text/css',
-                'extension': 'css'
-            },
-            'widgets.jsx': {
-                'folder': self.path + '/widgets',
-                'mimetype': 'application/x-javascript',
-                'extension': 'jsx',
-            },
-        }
-        if filename in assets.keys():
-            asset = assets[filename]
-            self.set_header('Content-Type', asset['mimetype'])
-            return self.write(merge_files(**asset))
-        return self.send_error(404)
+        if filename.startswith('app'):
+            return self.serve_assets(filename)
+        self.render("index.html")
+
+    def serve_assets(self, filename):
+        if filename not in self.assets.keys():
+            return self.send_error(404)
+        
+        asset = self.assets[filename]
+        self.set_header('Content-Type', asset['mimetype'])
+        for root, dirs, files in os.walk(self.path + asset['folder']):
+            ext = asset['extension']
+            for f in [f for f in sorted(files) if f.endswith(ext)]:
+                fd = open(root + '/' + f)
+                self.write('\n/* {0} file: {1} */\n'.format(ext, f))
+                self.write(fd.read())
 
 
 class PublishHandler(RequestHandler):
@@ -90,11 +86,10 @@ messages = {}
 def make_app(path, auth_token):
     args = dict(clients=clients, messages=messages, auth_token=auth_token)
     urls = [
-        (r'/', MainHandler),
         (r'/subscribe', EventHandler),
-        (r'/app/(.*)', AssetHandler, dict(path=path)),
-        (r'/assets/(.*)', StaticFileHandler, dict(path=path + '/assets')),
         (r'/widgets/([^/]+)', PublishHandler, args),
+        (r'/assets/(.*)', StaticFileHandler, dict(path=path + '/assets')),
+        (r'/(.*)', MainHandler, dict(path=path)),
     ]
     return Application(
         urls,
