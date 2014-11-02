@@ -3,7 +3,7 @@ import sys
 import shutil
 import server
 
-DIRS = ['widgets', 'dashboards', 'assets']
+DIRS = ['widgets', 'dashboards', 'assets', 'jobs']
 USAGE = '''Commands:
   drax help                 # Shows this message
   drax init PROJECT_NAME    # Sets up new dashboard in directory

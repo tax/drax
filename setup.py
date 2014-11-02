@@ -11,7 +11,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='drax',
-    version='0.2.0',
+    version='0.3.0',
     author='tax',
     author_email='paultax@gmail.com',
     include_package_data=True,
