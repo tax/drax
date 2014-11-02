@@ -29,11 +29,6 @@ class MainHandler(RequestHandler):
     def initialize(self, path):
         self.path = path
 
-    def get(self, filename):
-        if filename.startswith('app'):
-            return self.serve_assets(filename)
-        self.render("index.html")
-
     def serve_assets(self, filename):
         if filename not in self.assets.keys():
             return self.send_error(404)
@@ -46,6 +41,18 @@ class MainHandler(RequestHandler):
                 fd = open(root + '/' + f)
                 self.write('\n/* {0} file: {1} */\n'.format(ext, f))
                 self.write(fd.read())
+
+    def get(self, filename):
+        if filename.startswith('app'):
+            return self.serve_assets(filename)
+        
+        dashboard = 'index.html'
+        if filename != '':
+            dashboard = filename + '.html'
+        try:    
+            self.render(dashboard)
+        except IOError:
+            return self.send_error(404)
 
 
 class PublishHandler(RequestHandler):
@@ -93,17 +100,19 @@ def make_app(path, auth_token):
     ]
     return Application(
         urls,
-        template_path=path + '/templates/',
+        template_path=path + '/dashboards/',
         static_path=path + '/assets/',
         compiled_template_cache=False)
 
 
 def make_jobs(path):
     jobs = {}
-    for f in os.listdir(path + '/jobs'):
-        if f.endswith('.py'):
-            jobs[f] = imp.load_source(f, path + '/jobs/' + f)
-            PeriodicCallback(jobs[f].callback, jobs[f].callback_time).start()
+    mods = [f for f in os.listdir(path + '/jobs') 
+                if f.endswith('.py') and f != '__init__.py']
+    for mod in mods:
+        modname = 'jobs.' + os.path.splitext(mod)[0]
+        jobs[mod] = __import__(modname, fromlist=['callback', 'callback_time'])
+        PeriodicCallback(jobs[mod].callback, jobs[mod].callback_time).start()
 
 
 def main(path, port=8888, auth_token=None):

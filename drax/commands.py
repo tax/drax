@@ -3,8 +3,8 @@ import sys
 import shutil
 import server
 
-DIRS = ['widgets', 'templates', 'assets']
-usage = '''Commands:
+DIRS = ['widgets', 'dashboards', 'assets']
+USAGE = '''Commands:
   drax help                 # Shows this message
   drax init PROJECT_NAME    # Sets up new dashboard in directory
   drax start                # Starts the server in a drax project directory
@@ -13,7 +13,7 @@ usage = '''Commands:
 
 def main():
     if len(sys.argv) == 1:
-        print usage
+        print USAGE
         return
 
     if sys.argv[1].lower() == 'init':
@@ -21,9 +21,9 @@ def main():
     elif sys.argv[1].lower() == 'start':
         start()
     elif sys.argv[1].lower() == 'help':
-        print usage
+        print USAGE
     else:
-        print usage
+        print USAGE
         print 'Could not find command "{0}".'.format(sys.argv[1])
 
 

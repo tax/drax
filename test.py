@@ -22,13 +22,13 @@ class TestDraxCommandline(unittest.TestCase):
         # make sure the shuffled sequence does not lose any elements
         sys.argv = ['drax']
         commands.main()
-        self.assertTrue(commands.usage in sys.stdout.getvalue())
+        self.assertTrue(commands.USAGE in sys.stdout.getvalue())
 
         # Reset stdout
         sys.stdout = StringIO()
         sys.argv = ['drax', 'help']
         commands.main()
-        self.assertTrue(commands.usage in sys.stdout.getvalue())
+        self.assertTrue(commands.USAGE in sys.stdout.getvalue())
         
         # Reset stdout
         sys.stdout = StringIO()

@@ -329,6 +329,7 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 .icon-paste:before                { content: "\f0ea"; }
 
 .icon-user-md:before              { content: "\f200"; }
+
 /*! gridster.js - v0.1.0 - 2012-08-14
 * http://gridster.net/
 * Copyright (c) 2012 ducksboard; Licensed MIT */

@@ -1,1 +1,29 @@
-myjob
+import json
+from tornado.httpclient import AsyncHTTPClient
+
+# callback function is called every 30 seconds
+callback_time = 3000
+
+
+def get_myapi_data():
+    # Add logic to fetch data from somewhere
+    data = 'This is some data loaded from somewhere...'
+    return data
+
+
+def callback():
+    data = {
+        'auth_token': 'YOUR_AUTH_TOKEN',
+        # the id of the widget you want to post the data to
+        'id': 'text',
+        'title': 'Some Info:',
+        'icon': 'icon-star',
+        'text': get_myapi_data()
+    }
+    payload = json.dumps(data)
+    print payload
+    url = 'http://localhost:8888/widgets/text'
+
+    # Using tornado async client
+    client = AsyncHTTPClient()
+    client.fetch(url, None, method='POST', headers=None, body=payload)
