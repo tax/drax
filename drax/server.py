@@ -1,7 +1,6 @@
 import time
 import json
 import os
-import imp
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application, StaticFileHandler
 from tornado.websocket import WebSocketHandler
@@ -32,7 +31,7 @@ class MainHandler(RequestHandler):
     def serve_assets(self, filename):
         if filename not in self.assets.keys():
             return self.send_error(404)
-        
+
         asset = self.assets[filename]
         self.set_header('Content-Type', asset['mimetype'])
         for root, dirs, files in os.walk(self.path + asset['folder']):
@@ -45,11 +44,11 @@ class MainHandler(RequestHandler):
     def get(self, filename):
         if filename.startswith('app'):
             return self.serve_assets(filename)
-        
+
         dashboard = 'index.html'
         if filename != '':
             dashboard = filename + '.html'
-        try:    
+        try:
             self.render(dashboard)
         except IOError:
             return self.send_error(404)
@@ -107,8 +106,8 @@ def make_app(path, auth_token):
 
 def make_jobs(path):
     jobs = {}
-    mods = [f for f in os.listdir(path + '/jobs') 
-                if f.endswith('.py') and f != '__init__.py']
+    mods = [f for f in os.listdir(path + '/jobs')
+            if f.endswith('.py') and f != '__init__.py']
     for mod in mods:
         modname = 'jobs.' + os.path.splitext(mod)[0]
         jobs[mod] = __import__(modname, fromlist=['callback', 'callback_time'])
@@ -124,6 +123,3 @@ def main(path, port=8888, auth_token=None):
         IOLoop.instance().start()
     except KeyboardInterrupt:
         IOLoop.instance().stop()
-
-if __name__ == '__main__':
-    main(os.getcwd() + '/drax')
