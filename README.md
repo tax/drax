@@ -1,6 +1,6 @@
 #Drax dashboard
 
-Drax is a python and react implementation of the beautiful [dashing](http://shopify.github.io/dashing/) app. I created this project to further develop my [react](http://facebook.github.io/react/index.html) and  [tornado](http://www.tornadoweb.org/) skills.
+Drax is a python and react implementation of the beautiful [dashing](http://shopify.github.io/dashing/) app. I created this project to develop my [react](http://facebook.github.io/react/index.html) and  [tornado](http://www.tornadoweb.org/) skills.
 
 ## How to use drax
 After you installed drax run the following commands:
