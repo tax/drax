@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>Drax</title>
+    <script type="text/javascript" src="/app/main.js"></script>
+    <script type="text/jsx" src="/app/widgets.jsx"></script>
+    <link rel="stylesheet" href="/app/main.css">
+  </head>
+  <body>
+    <div id="dashboard"></div>
+  </body>
+
+  <script type="text/jsx">
+  React.render(
+    <Dashboard>
+      <Clock widgetid="clock" row={1} col={1}/>
+      <HeartBeat widgetid="hearthbeat" row={1} col={1}/>
+      <Text widgetid="text" row={1} col={4} initialTitle="This is a title"/>
+      <List widgetid="list" row={1} col={3} sizey={2}/>
+      <Number widgetid="valuation" row={2} col={1} initialTitle="Current valuation" initialInfo="In billions"/>
+      <Meter widgetid="synergy" initialTitle="Synergy" initialValue={10} min={0} max={100} row={2} col={2}/>
+      <Image widgetid="myimage7" row={2} col={4} src="http://dashingdemo.herokuapp.com/assets/logo.png"/>
+    </Dashboard>,
+    document.getElementById('dashboard'));
+
+  </script>
+
+</html>
