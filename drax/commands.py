@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import shutil
@@ -8,6 +9,8 @@ USAGE = '''Commands:
   drax help                 # Shows this message
   drax init PROJECT_NAME    # Sets up new dashboard in directory
   drax start                # Starts the server in a drax project directory
+      --port=port
+      --auth_token=SECRET
 '''
 
 
@@ -60,4 +63,8 @@ def start():
             print 'This is not a drax project, directory "{}"'\
                   ' is missing'.format(d)
             return
-    server.main(os.getcwd())
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', default=8888)
+    parser.add_argument('--auth_token', default=None)
+    args = parser.parse_args(sys.argv[2:])
+    server.main(os.getcwd(), auth_token=args.auth_token, port=args.port)

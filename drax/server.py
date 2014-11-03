@@ -1,6 +1,7 @@
 import time
 import json
 import os
+import sys
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application, StaticFileHandler
 from tornado.websocket import WebSocketHandler
@@ -108,6 +109,8 @@ def make_jobs(path):
     jobs = {}
     mods = [f for f in os.listdir(path + '/jobs')
             if f.endswith('.py') and f != '__init__.py']
+    if path not in sys.path:
+        sys.path.append(path)
     for mod in mods:
         modname = 'jobs.' + os.path.splitext(mod)[0]
         jobs[mod] = __import__(modname, fromlist=['callback', 'callback_time'])

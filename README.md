@@ -41,7 +41,7 @@ By editing the *index.html* file in the *templates* directory:
 
 If you want to add more dashboards copy *index.html* to a new html file in the templates directory and edit that file.
 
-If you created a new dashboard *status.html* it will be available on http://localhost:8888/status **(Notice that this is without the ".html")**.
+If you created a new dashboard *status.html* it will be available on http://localhost:8888/status **(Notice the url without the ".html")**.
 
 
 ## How get data into widgets

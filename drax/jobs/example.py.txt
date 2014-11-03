@@ -2,7 +2,7 @@ import json
 from tornado.httpclient import AsyncHTTPClient
 
 # callback function is called every 30 seconds
-callback_time = 3000
+callback_time = 30000
 
 
 def get_myapi_data():
