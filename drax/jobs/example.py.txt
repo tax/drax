@@ -21,7 +21,6 @@ def callback():
         'text': get_myapi_data()
     }
     payload = json.dumps(data)
-    print payload
     url = 'http://localhost:8888/widgets/text'
 
     # Using tornado async client
