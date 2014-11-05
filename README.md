@@ -110,13 +110,13 @@ def callback():
 You can also perform dashboard-level actions by posting to /dashboards/dashboard_id. Currently there is a single event available, reload, that will refresh the target dashboard in the browser.
 
 ```
-curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:3030/dashboards/sample
+curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:8888/dashboards/sample
 ```
 
 If you want an event to target every dashboard, you can use a wildcard (*).
 
 ```
-curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:3030/dashboards/*
+curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:8888/dashboards/*
 ```
 
 ## Installation
