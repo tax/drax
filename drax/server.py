@@ -61,17 +61,23 @@ class PublishHandler(RequestHandler):
         self.messages = messages
         self.auth_token = auth_token
 
-    def post(self, widget):
+    def post(self, target):
         data = json.loads(self.request.body)
         if self.auth_token and data.get('auth_token', '') != self.auth_token:
             return self.send_error(status_code=401)
+        event = 'widget'
+        if self.request.path.startswith('/dashboards'):
+            event = 'dashboard'
+
         data.pop('auth_token', None)
-        data['id'] = widget
+        data['id'] = target
         data['updatedAt'] = time.time()
-        msg = json.dumps(data)
+        msg = json.dumps({'data': data, 'event': event})
         for client in self.clients:
             client.write_message(msg)
-        self.messages[widget] = msg
+
+        if event == 'widget':
+            self.messages[target] = msg
         self.set_status(204)
 
 
@@ -95,6 +101,7 @@ def make_app(path, auth_token):
     urls = [
         (r'/subscribe', EventHandler),
         (r'/widgets/([^/]+)', PublishHandler, args),
+        (r'/dashboards/([^/]+)', PublishHandler, args),
         (r'/assets/(.*)', StaticFileHandler, dict(path=path + '/assets')),
         (r'/(.*)', MainHandler, dict(path=path)),
     ]
@@ -126,3 +133,6 @@ def main(path, port=8888, auth_token=None):
         IOLoop.instance().start()
     except KeyboardInterrupt:
         IOLoop.instance().stop()
+
+if __name__ == '__main__':
+    main(os.getcwd() + '/drax')

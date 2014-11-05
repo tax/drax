@@ -96,8 +96,8 @@ class TestDraxServer(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(204, response.code)
 
         event = json.loads(server.messages['mywidget'])
-        self.assertIn('updatedAt', event, 'updatedAt should be added')
-        self.assertNotIn('auth_token', event, 'auth_token must be removed')
+        self.assertIn('updatedAt', event['data'], 'updatedAt should be added')
+        self.assertNotIn('auth_token', event['data'], 'auth_token not removed')
 
 
 class TestDraxServerEvents(tornado.testing.AsyncHTTPTestCase):

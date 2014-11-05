@@ -27,7 +27,7 @@ By editing the *index.html* file in the *templates* directory:
 
 ```javascript
   React.render(
-    <Dashboard>
+    <Dashboard widgetHeight={450} widgetWidth={360}>
       <Clock widgetid="clock" row={1} col={1}/>
       <HeartBeat widgetid="hearthbeat" row={1} col={1}/>
       <Text widgetid="mywidget3" row={1} col={4} initialTitle="This is the title" initialText="This is my initial text...."/>
@@ -105,7 +105,19 @@ def callback():
     client.fetch(url, None, method='POST', headers=None, body=payload)
 ```
 
+## How to reload your dashboards
 
+You can also perform dashboard-level actions by posting to /dashboards/dashboard_id. Currently there is a single event available, reload, that will refresh the target dashboard in the browser.
+
+```
+curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:3030/dashboards/sample
+```
+
+If you want an event to target every dashboard, you can use a wildcard (*).
+
+```
+curl -i -d '{ "auth_token": "YOUR_AUTH_TOKEN", "event": "reload"}' http://localhost:3030/dashboards/*
+```
 
 ## Installation
 Installing drax is easy with pip:

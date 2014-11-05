@@ -3,11 +3,22 @@ var WidgetStore = {
 
     init: function(eventSource){
       var that = this;
-      eventSource.onmessage = function(msg){
-        console.log(msg);
-        var data = JSON.parse(msg.data); 
-        var cb = that._widgets[data.id];
-        return cb(that.formatData(data));        
+      eventSource.onmessage = function(evt){
+        var msg = JSON.parse(evt.data);
+        
+        // Send reload event to dashboard
+        if(msg.event == 'dashboard' && msg.data.event == 'reload'){
+          var dashboard = msg.data.id
+          if(dashboard == '*' || window.location.pathname == '/'+dashboard){
+            window.location.reload(true);  
+          }
+        }
+
+        if(msg.event == 'widget'){
+          var cb = that._widgets[msg.data.id];
+          return cb(that.formatData(msg.data));
+        }
+
       }
     },
 
