@@ -28,6 +28,10 @@ class MainHandler(RequestHandler):
 
     def initialize(self, path):
         self.path = path
+        self.dashboards = []
+        for f in sorted(os.listdir(path + '/dashboards')):
+            if f.endswith('.html'):
+                self.dashboards.append(f.strip('.html'))
 
     def serve_assets(self, filename):
         if filename not in self.assets.keys():
@@ -43,16 +47,15 @@ class MainHandler(RequestHandler):
                 self.write(fd.read())
 
     def get(self, filename):
-        if filename.startswith('app'):
+        if filename == '':
+            self.redirect('/' + self.dashboards[0])
+        
+        if filename.startswith('app/'):
             return self.serve_assets(filename)
 
-        dashboard = 'index.html'
-        if filename != '':
-            dashboard = filename + '.html'
-        try:
-            self.render(dashboard)
-        except IOError:
+        if filename not in self.dashboards:
             return self.send_error(404)
+        self.render(filename + '.html')
 
 
 class PublishHandler(RequestHandler):
